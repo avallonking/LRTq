@@ -1,0 +1,11 @@
+Package: LRTq
+Type: Package
+Title: Rare variant association test for quantitative traits with likelihood ratio test
+Version: 1.0
+Date: 2019-06-15
+Author: Jiajin Li (Albert Lee)
+Maintainer: Jiajin Li (Albert Lee) <lijj36@ucla.edu>
+Description: LRTq, a powerful statistical method that infers causal statuses of rare variants with prior information and observational data and then aggregate rare variants in a nonlinear manner. With the assumption that individuals with abnormal gene expression levels are likely to enrich for causal rare variants, LRTq performs a likelihood ratio test to identify whether there are at least one causal rare variants in the variant group. It first computes the ratio between the null model that assumes no causal rare variants in a variant set and the alternative model that asserts at least one causal rare variants. LRTq then calculates p-value for the likelihood ratio between these two models using permutation test.
+License: MIT
+Imports: Rcpp (>= 1.0.1)
+LinkingTo: Rcpp
