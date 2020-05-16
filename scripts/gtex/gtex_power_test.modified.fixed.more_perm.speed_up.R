@@ -584,7 +584,7 @@ weights.file.prefix <- args[9]
 print(args)
 
 require(Rcpp)
-sourceCpp("/u/nobackup/eeskin2/k8688933/rare_var/script/lrt.cpp")
+sourceCpp("/u/project/eeskin2/k8688933/rare_var/script/lrt.cpp")
 
 require(data.table)
 geno.matrix <- fread(geno.matrix.file, data.table=F)
