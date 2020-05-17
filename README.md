@@ -1,5 +1,5 @@
 # LRTq
-Identifying effects of rare variants with likelihood ratio test
+Identifying effects of rare variants with likelihood ratio test.
 
 To install the R package:
 ```R
