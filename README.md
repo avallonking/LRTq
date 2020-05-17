@@ -1,5 +1,5 @@
 # LRTq
-Identifying regulatory effects of rare variants with likelihood ratio test.
+LRTq is used for identifying regulatory effects of rare variants with likelihood ratio test.
 
 To install the R package:
 ```R
