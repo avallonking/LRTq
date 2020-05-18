@@ -18,6 +18,7 @@ NumericVector find_sigma_var(NumericVector expr, LogicalMatrix idv_rare, int K, 
   return sigma_var;
 }
 
+// compute LRT-q statistics
 double compute_lrt(double l0, NumericVector ln_a, NumericVector ln_b_pre, NumericVector sigma_var, int K, int N) {
   NumericVector ln_b(K);
   double lr, l0l1, l1;
@@ -51,8 +52,10 @@ double LRTq(NumericVector expr, IntegerMatrix geno, NumericVector causal_ratio, 
   ln_b_pre = log(causal_ratio) - N / 2 * log(2 * PI) - N / 2;
   l0 = sum(ln_a);
 
+  // unpermuted LRT-q statisitcs
   lrt_stat = compute_lrt(l0, ln_a, ln_b_pre, sigma_var, K, N);
   
+  // permutation
   for (t = 0; t < perm; t++) {
     perm_sample = sample(expr.size(), expr.size()) - 1;
     sigma_var = find_sigma_var(expr[perm_sample], idv_rare, K, N);
