@@ -6,6 +6,7 @@ double ss(NumericVector x) {
   return mean(pow(x-mean(x), 2));
 }
 
+// helper function to calculate sigma for rare variant i
 NumericVector find_sigma_var(NumericVector expr, LogicalMatrix idv_rare, int K, int N) {
   NumericVector expr_x, expr_y, sigma_var(K);
   int i;
