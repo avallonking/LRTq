@@ -31,6 +31,7 @@ double compute_lrt(double l0, NumericVector ln_a, NumericVector ln_b_pre, Numeri
 }
 
 // [[Rcpp::export]]
+// main function for LRT-q
 double LRTq(NumericVector expr, IntegerMatrix geno, NumericVector causal_ratio, int perm = 1000) {
   // all variants should be rare here
   int K, N, i, t, significant_lrt_stat = 0;
