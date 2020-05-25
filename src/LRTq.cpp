@@ -2,6 +2,7 @@
 
 using namespace Rcpp;
 
+// sum of squares
 double ss(NumericVector x) {
   return mean(pow(x-mean(x), 2));
 }
