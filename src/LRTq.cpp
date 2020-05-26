@@ -25,6 +25,7 @@ double compute_lrt(double l0, NumericVector ln_a, NumericVector ln_b_pre, Numeri
   NumericVector ln_b(K);
   double lr, l0l1, l1;
   ln_b = ln_b_pre - N / 2 * log(sigma_var);
+  // l0l1: l0 + l1
   l0l1 = l0 + sum(log(1 + exp(ln_b - ln_a)));
   l1 = l0l1 + log(1 - exp(l0 - l0l1));
   lr = l1 - l0;
