@@ -68,6 +68,7 @@ double LRTq(NumericVector expr, IntegerMatrix geno, NumericVector causal_ratio, 
       significant_lrt_stat += 1;
   }
   // std::cout << significant_lrt_stat;
+  // p-values from permutation = the proportion of significant permutations
   perm_pval = static_cast<double>(significant_lrt_stat + 1) / (perm + 1);
   
   // return perm_pval;
