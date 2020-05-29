@@ -6,3 +6,9 @@ To install the R package:
 library(devtools)
 install_github("avallonking/LRTq")
 ```
+
+For usage:
+```R
+library(LRTq)
+?LRTq
+```
