@@ -48,3 +48,6 @@ LRTq(expr = E, geno = G, causal_ratio = rep(0.30, ncol(G)), perm = 1000)
 ## the results could be 0.000999001, 0.001998002, or 0.002997003, 
 ## due to the randomness in the permutation test
 ```
+
+#### Organization of this repository
+Scripts for generating all figures are in `https://github.com/avallonking/LRTq/blob/master/analysis_scripts/figures/`
