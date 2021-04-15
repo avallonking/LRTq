@@ -6,7 +6,7 @@
   require(tidyr)
   require(dplyr)
   require(Cairo)
-  setwd("/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/")
+  setwd("./data/")
   # load data - RV eGenes
   {
     indiv.with.rare.var <- lapply(dir("indiv.with.rare.var.idx/", full.names = T), function(x) {try(fread(x), T)})
@@ -98,24 +98,24 @@
     # gene list preprocessing
     {
       # overlap with clinvar
-      clinvar <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/clinvar/unique_gene_symbolclinvar.vcf", header=F, data.table = F)
-      g2p <- rbindlist(lapply(dir("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/gene2phenotype", 
+      clinvar <- fread("./data/gene_sets/clinvar/unique_gene_symbolclinvar.vcf", header=F, data.table = F)
+      g2p <- rbindlist(lapply(dir("./data/gene_sets/gene2phenotype", 
                                   full.names = T), fread))
       # gwas catalog (genes in REPORTED GENE(S) or MAPPED_GENE)
-      gwas.catalog <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/gwas_catalog/reported.genes")
+      gwas.catalog <- fread("./data/gene_sets/gwas_catalog/reported.genes")
       gwas.catalog %>% dplyr::select("REPORTED GENE(S)") %>% distinct() -> gwas.catalog
       # omim
-      omim <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/omim/mim2gene.txt")
+      omim <- fread("./data/gene_sets/omim/mim2gene.txt")
       colnames(omim) <- c("MIM_Number", "MIM_Entry_Type", "Entrez_Gene_ID", "HGNC", "Ensembl_Gene_ID")
       # orphanet
       require(XML)
-      orphanet <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/orphanet/orphanet.genes",
+      orphanet <- fread("./data/gene_sets/orphanet/orphanet.genes",
                         header = F)
-      cancer.genes <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/GeneListsOther/cancer.genes.gold.standard.csv")
-      cardio.genes <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/GeneListsOther/cardio.genes.gold.standard.csv")
-      acmg <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/acmg/genes.list")
-      height <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/other_genesets/generif.height.geneset.txt", header = F)
-      bmi <- fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/other_genesets/generif.bmi.geneset.txt", header = F)
+      cancer.genes <- fread("./data/gene_sets/GeneListsOther/cancer.genes.gold.standard.csv")
+      cardio.genes <- fread("./data/gene_sets/GeneListsOther/cardio.genes.gold.standard.csv")
+      acmg <- fread("./data/gene_sets/acmg/genes.list")
+      height <- fread("./data/gene_sets/other_genesets/generif.height.geneset.txt", header = F)
+      bmi <- fread("./data/gene_sets/other_genesets/generif.bmi.geneset.txt", header = F)
     }
     
     # annotate outliers
@@ -135,7 +135,7 @@
       
       annotated.outliers <- lapply(outliers.per.gene$lrt, function(x) annotate.outliers(human, x))
       
-      saveRDS(annotated.outliers, "~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/outliers/all_tissues.outliers.annotated.lrt_only.rds")
+      saveRDS(annotated.outliers, "./data/gene_sets/all_tissues.outliers.annotated.lrt_only.rds")
     }
     
     # gene list enrichment
@@ -186,21 +186,12 @@
         gene.list.attributes$bmi <- gene.list.attributes$hgnc_symbol %in% uniq.bmi
         ###########################################################
         
-        # gene.list.attributes$lrt <- gene.list.attributes$gene %in% egenes
-        # gene.list.attributes$non.lrt <- 1 - gene.list.attributes$lrt
-        # gene.list.attributes$clinvar <- gene.list.attributes$hgnc_symbol %in% clinvar$V1
-        # gene.list.attributes$g2p <- gene.list.attributes$hgnc_symbol %in% g2p$`gene symbol`
-        # gene.list.attributes$omim <- (gene.list.attributes$hgnc_symbol %in% omim$HGNC) |
-        #   (gene.list.attributes$gene %in% omim$Ensembl_Gene_ID) |
-        #   (gene.list.attributes$entrezgene_id %in% omim$Entrez_Gene_ID)
-        # gene.list.attributes$orphanet <- gene.list.attributes$hgnc_symbol %in% orphanet$V1
-        # gene.list.attributes$gwas <- gene.list.attributes$hgnc_symbol %in% gwas.catalog$`REPORTED GENE(S)`
         gene.list.attributes$all_databases <-
           gene.list.attributes$clinvar | gene.list.attributes$g2p | gene.list.attributes$omim | gene.list.attributes$orphanet | gene.list.attributes$gwas | gene.list.attributes$cancer | gene.list.attributes$cardio | gene.list.attributes$acmg | gene.list.attributes$height
         
         if (early.output) {
           fwrite(gene.list.attributes, 
-                 "~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/all.tissues.gene.list.attributes")
+                 "./data/all.tissues.gene.list.attributes")
         }
         
         res <- data.frame(odd.ratio = numeric(), min.conf = numeric(),
@@ -243,21 +234,21 @@
           outliers$entrezgene_id <- entrez.hgnc$entrezgene_id[match(genes, entrez.hgnc$ensembl_gene_id)]
           return(outliers)
         }
-        total.expressed.genes = fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8//lrt.all_tissues.expresed_genes", 
+        total.expressed.genes = fread("./data/lrt.all_tissues.expresed_genes", 
                                       data.table=F, header=F)
-        lrt.egenes = fread("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8//lrt.all_tissues.egenes", 
+        lrt.egenes = fread("./data/lrt.all_tissues.egenes", 
                            data.table=F, header=F)
         colnames(total.expressed.genes) = "gene"
         colnames(lrt.egenes) = "gene"
         lrt.egenes = annotate.outliers(human, lrt.egenes)
         total.expressed.genes = annotate.outliers(human, total.expressed.genes)
-        saveRDS(total.expressed.genes, "~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8//total.annotated.genes.rds")
-        total.expressed.genes = readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8//total.annotated.genes.rds")
+        saveRDS(total.expressed.genes, "./data/total.annotated.genes.rds")
+        total.expressed.genes = readRDS("./data/total.annotated.genes.rds")
         all.tissue.gene.list.enrichment = gene.list.enrichment("all.tissues", lrt.egenes$gene, total.expressed.genes)
       }
       
       # Fig 4B
-      CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/gene.set.enrichment.pdf")
+      CairoPDF("../../materials/gene.set.enrichment.pdf")
       all.tissue.gene.list.enrichment$database = c("ClinVar", "G2P", "OMIM", "OrphaNet", "GWAS Catalog", 
                                                    "Cancer", "Cardio", "ACMG", "Height", "BMI", "All Databases")
       all.tissue.gene.list.enrichment$method = rep("LRT-q", nrow(all.tissue.gene.list.enrichment))

@@ -4,10 +4,10 @@
   library(ggpubr)
   library(Cairo)
   library(dplyr)
-  setwd("/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/simulation/power/decision_boundary")
+  file.dir = "./data/simulation/power/decision_boundary"
   
-  c05 = rbindlist(lapply(dir(pattern = "c05", full.names = T), fread))
-  c1 = rbindlist(lapply(dir(pattern = "c1", full.names = T), fread))
+  c05 = rbindlist(lapply(dir(file.dir, pattern = "c05", full.names = T), fread))
+  c1 = rbindlist(lapply(dir(file.dir, pattern = "c1", full.names = T), fread))
   
   c05 = na.omit(as.data.frame(c05))
   c05[, 7:14] = if_else(c05[, 7:14] < 0.05, "Significant", "Not significant")
@@ -23,7 +23,7 @@
 
   # Supplemental Fig S4A
   {
-    folder = "/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/materials/"
+    folder = "../materials/"
     pic.name = paste(folder, "decision_boundary.LRTq.c05.pdf", sep = "")
     CairoPDF(pic.name)
     p <- ggscatter(c05[1:2500, ], x = "reg.t.stat1", y = "reg.t.stat2", 
@@ -35,7 +35,7 @@
   }
   # Supplemental Fig S4C
   {
-    folder = "/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/materials/"
+    folder = "../materials/"
     pic.name = paste(folder, "decision_boundary.VT.c05.pdf", sep = "")
     CairoPDF(pic.name)
     p <- ggscatter(c05[1:2500, ], x = "reg.t.stat1", y = "reg.t.stat2", 
@@ -47,7 +47,7 @@
   }
   # Supplemental Fig S4B
   {
-    folder = "/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/materials/"
+    folder = "../materials/"
     pic.name = paste(folder, "decision_boundary.SKATO.c05.pdf", sep = "")
     CairoPDF(pic.name)
     p <- ggscatter(c05[1:2500, ], x = "reg.t.stat1", y = "reg.t.stat2", 
@@ -59,7 +59,7 @@
   }
   # Supplemental Fig S4D
   {
-    folder = "/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/materials/"
+    folder = "../materials/"
     pic.name = paste(folder, "decision_boundary.CMC.c05.pdf", sep = "")
     CairoPDF(pic.name)
     p <- ggscatter(c05[1:2500, ], x = "reg.t.stat1", y = "reg.t.stat2", 

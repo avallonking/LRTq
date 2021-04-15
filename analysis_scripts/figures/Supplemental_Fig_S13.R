@@ -4,7 +4,7 @@
   require(tidyr)
   require(dplyr)
   require(Cairo)
-  setwd("/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/")
+  setwd("./data/")
   # load data - RV eGenes
   {
     indiv.with.rare.var <- lapply(dir("indiv.with.rare.var.idx/", full.names = T), function(x) {try(fread(x), T)})
@@ -88,7 +88,7 @@
     summary.outliers.enrichment$pval = 
       pnorm(log(summary.outliers.enrichment$relative.risk) / summary.outliers.enrichment$log.se, lower.tail = F)
     
-    CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/log_tpm.egenes.enrichment.for.rare.var.pdf")
+    CairoPDF("../../materials/log_tpm.egenes.enrichment.for.rare.var.pdf")
     temp = summary.outliers.enrichment
     temp = temp[1:8, ]
     temp$threshold = as.character(temp$threshold)

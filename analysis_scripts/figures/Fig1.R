@@ -5,7 +5,6 @@
     require(ggpubr)
     require(Cairo)
     require(ACAT)
-    setwd("./data/simulation/")
 
     # power
     {
@@ -17,7 +16,7 @@
                     eff = paste("a", a, sep = "")
                     p.rate = paste("protective_rate", p, sep = "")
                     file.pattern = paste(causal, eff, "repeat1000", p.rate, "\\d+\\.csv", sep = ".")
-                    raw.data = rbindlist(lapply(dir("power/", 
+                    raw.data = rbindlist(lapply(dir("./data/simulation/power/", 
                                                     pattern = file.pattern, full.names = T), 
                                                 fread))
                     raw.data$`ACAT-O` = apply(raw.data, 1, function(x) ACAT(c(x[4], x[5], x[6])))

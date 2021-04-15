@@ -669,7 +669,6 @@ perform.test <- function(tissue.expr, geno.matrix, gene.set, gene.list, covar, s
 }
 
 # main
-.libPaths("/u/project/eeskin2/k8688933/R/x86_64-pc-linux-gnu-library/3.5/")
 args <- commandArgs(trailingOnly=T)
 tissue.expr.file <- args[1]
 geno.matrix.file <- args[2]
@@ -687,8 +686,8 @@ print(args)
 
 require(Rcpp)
 require(parallel)
-sourceCpp("/u/project/eeskin2/k8688933/rare_var/script/lrt.cpp")
-source("/u/project/eeskin2/k8688933/rare_var/vt/rarevarianttests20100701/rareVariantTests.functions_only.R")
+sourceCpp("./methods_source/lrt.cpp")
+source("./methods_source/rareVariantTests.functions_only.R")
 
 require(data.table)
 geno.matrix <- fread(geno.matrix.file, data.table=F)

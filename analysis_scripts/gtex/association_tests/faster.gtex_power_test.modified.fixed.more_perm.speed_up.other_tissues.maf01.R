@@ -74,7 +74,7 @@ my_lrt_method <- function(E, G, idv.rare, e = exp(1), c = NULL, grid.search = F)
   return(lr)
 }
 
-LRT <- function(y, X, perm = 1000, e = exp(1), c = NULL, maf = 0.05, grid.search = F) {
+LRT <- function(y, X, perm = 1000, e = exp(1), c = NULL, maf = 0.01, grid.search = F) {
   # get minor allele frequencies
   MAF = colMeans(X, na.rm=TRUE) / 2   
   # how many variants < maf
@@ -193,7 +193,7 @@ VT <- function(y, X, perm=1000, ksi=NULL) {
 
 # Weighted methods - WSS
 # use linear regression + Wald statistic
-WSS.agg <- function(y, X, threshold = 1.64, covariates = NULL, maf = 0.05) {
+WSS.agg <- function(y, X, threshold = 1.64, covariates = NULL, maf = 0.01) {
   require(car)
   # each row represents each individual, each column represents each variant
   # assume that all variants are in one small-size gene, so we do need to 
@@ -312,7 +312,7 @@ WSS <- function(y, X, perm=1000, threshold = 1.64) {
 }
 
 # Aggregation methods - BURDEN
-BURDEN <- function(y, X, maf=0.05, covariates = NULL) {
+BURDEN <- function(y, X, maf=0.01, covariates = NULL) {
   require(car)
   # each row represents each individual, each column represents each variant
   # assume that all variants are in one small-size gene, so we do need to 
@@ -360,7 +360,7 @@ BURDEN <- function(y, X, maf=0.05, covariates = NULL) {
 }
 
 # Collapsing methods - CMC
-CMC <- function(y, X, maf=0.05, covariates = NULL) {
+CMC <- function(y, X, maf=0.01, covariates = NULL) {
   require(car)
   # each row represents each individual, each column represents each variant
   # assume that all variants are in one small-size gene, so we do need to 
@@ -485,23 +485,51 @@ get.weights <- function(weights, selected.snp, rare.var.idx, norm="none", impute
      return(selected.weights)
 }
 
-perform.test <- function(tissue.expr, geno.matrix, gene.set, gene.list, covar, start, end, weights.file.prefix, maf.cutoff = 0.05, perm = 10000) {
+prepare.vt.ind <- function(E) {
+    data.frame("indid" = c(0:(length(E) - 1)), "pheno" = E)
+}
+
+prepare.vt.csnp <- function(weights) {
+    data.frame("snpid" = c(0:(length(weights) - 1)), "polyphen" = weights)
+}
+
+prepare.vt.cgeno <- function(G) {
+    a = as.data.frame(which(G == 1, arr.ind = T) - 1)
+    b = as.data.frame(which(G == 2, arr.ind = T) - 1)
+    colnames(a) = c("indid", "snpid")
+    colnames(b) = c("indid", "snpid")
+    if (nrow(a) != 0 & nrow(b) != 0) {
+        a$count = 1
+        b$count = 2
+        return(rbind(a, b))
+    } else if (nrow(a) == 0) {
+        b$count = 2
+        return(b)
+    } else {
+        a$count = 1
+        return(a)
+    }
+}
+
+perform.test <- function(tissue.expr, geno.matrix, gene.set, gene.list, covar, start, end, weights.file.prefix, maf.cutoff = 0.01, perm = 100000, nodes=16) {
+    #nodes = detectCores()
     require(stringr)
     require(RNOmni)
     require(data.table)
-    p.values.vt <- as.data.frame(matrix(nrow = end-start+1, ncol = 3))
-    p.values.lrt <- as.data.frame(matrix(nrow = end-start+1, ncol = 3))
-    p.values.skat <- as.data.frame(matrix(nrow = end-start+1, ncol = 3))
-    colnames(p.values.vt) <- c("Gene_ID", "MAFxCADD", "MAF")
-    colnames(p.values.lrt) <- c("Gene_ID", "MAFxCADD", "MAF")
-    colnames(p.values.skat) <- c("Gene_ID", "MAFxCADD", "MAF")
+    require(doMC)
+    p.values.vt <- as.data.frame(matrix(nrow = end-start+1, ncol = 9))
+    p.values.lrt <- as.data.frame(matrix(nrow = end-start+1, ncol = 9))
+    p.values.skat <- as.data.frame(matrix(nrow = end-start+1, ncol = 9))
+    colnames(p.values.vt) <- c("Gene_ID", "Distance", "MAFxCADD", "MAF", "MAFxDistance", "DistancexCADDxMAF", "Unweighted", "LINSIGHT", "CADD")
+    colnames(p.values.lrt) <- c("Gene_ID", "Distance", "MAFxCADD", "MAF", "MAFxDistance", "DistancexCADDxMAF", "Unweighted", "LINSIGHT", "CADD")
+    colnames(p.values.skat) <- c("Gene_ID", "Distance", "MAFxCADD", "MAF", "MAFxDistance", "DistancexCADDxMAF", "Unweighted", "LINSIGHT", "CADD")
     selected.idv.idx <- which(colnames(tissue.expr) %in% colnames(geno.matrix))
     selected.idv.idx1 <- which(colnames(geno.matrix) %in% colnames(tissue.expr)[selected.idv.idx])
     geno.matrix <- geno.matrix[, c(1, selected.idv.idx1)]
     selected.idv.idx2 <- which(covar$ID %in% colnames(geno.matrix))
     covar <- covar[selected.idv.idx2, -1]
 
-    weights.files <- paste(weights.file.prefix, c("maf", "cadd_scaled"), sep=".")
+    weights.files <- paste(weights.file.prefix, c("maf", "cadd_scaled", "dis", "linsight"), sep=".")
     weights <- lapply(weights.files, fread)
 
     for (i in start:end) {
@@ -514,7 +542,7 @@ perform.test <- function(tissue.expr, geno.matrix, gene.set, gene.list, covar, s
          G <- geno.matrix[geno.matrix$ID %in% included.snp, ]
          G <- remove.missing.impute(G)
 
-         if (is.null(G)) {
+         if (is.null(G) | selected.gene == "ENSG00000183117") {
             i <- i-start+1
             p.values.vt[i, 1] = selected.gene
             p.values.lrt[i, 1] = selected.gene
@@ -561,22 +589,48 @@ perform.test <- function(tissue.expr, geno.matrix, gene.set, gene.list, covar, s
          expr <- as.numeric(tissue.expr[tissue.expr$gene_id==selected.gene, selected.idv.idx])
          E <- rankNorm(lm(expr ~ as.matrix(covar))$residuals)
 
+         selected.weights.unweighted <- rep(0.30, ncol(G))
          selected.weights.maf <- get.weights(weights[[1]], selected.snp, rare.var.idx)
          selected.weights.cadd <- get.weights(weights[[2]], selected.snp, rare.var.idx, norm="l2")
+         selected.weights.dis <- get.weights(weights[[3]], selected.snp, rare.var.idx, norm="20k", impute="zero")
+         selected.weights.linsight <- get.weights(weights[[4]], selected.snp, rare.var.idx)
 
          i <- i-start+1
 
          p.values.vt[i, 1] = selected.gene
-         p.values.vt[i, 2] = VT(E, G, perm = perm, ksi = selected.weights.maf * selected.weights.cadd)$sig.perm
-         p.values.vt[i, 3] = VT(E, G, perm = perm, ksi = selected.weights.maf)$sig.perm
+
+         ind.vt = prepare.vt.ind(E)
+         cgeno.vt = prepare.vt.cgeno(G)
+
+         p.values.vt[i, 2] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.dis), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 3] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.maf * selected.weights.cadd), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 4] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.maf), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 5] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.maf * selected.weights.dis), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 6] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.dis * selected.weights.cadd * selected.weights.maf), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 7] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.unweighted), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 8] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.linsight), cgeno.vt, permutations = perm, nodes = nodes)
+         p.values.vt[i, 9] = vt.fast(ind.vt, prepare.vt.csnp(selected.weights.cadd), cgeno.vt, permutations = perm, nodes = nodes)
 
          p.values.lrt[i, 1] = selected.gene
-         p.values.lrt[i, 2] = lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.maf * selected.weights.cadd, perm = perm)
-         p.values.lrt[i, 3] = lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.maf, perm = perm)
+         registerDoMC()
+         p.values.lrt[i, 2] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.dis, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 3] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.maf * selected.weights.cadd, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 4] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.maf, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 5] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.maf * selected.weights.dis, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 6] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.dis * selected.weights.cadd * selected.weights.maf, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 7] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.unweighted, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 8] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.linsight, perm = perm / nodes)) + 1) / (perm + 1)
+         p.values.lrt[i, 9] = ((foreach(i = 1:nodes, .combine = '+') %dopar% lrt_perm(expr = E, geno = G, causal_ratio = selected.weights.cadd, perm = perm / nodes)) + 1) / (perm + 1)
          
-#         p.values.skat[i, 1] = selected.gene
-         #p.values.skat[i, 2] = SKAT_(E, G, covariates = NULL, weight = selected.weights.maf * selected.weights.cadd)$p.value
-#         p.values.skat[i, 3] = SKAT_(E, G, covariates = NULL, weight = selected.weights.maf)$p.value
+         p.values.skat[i, 1] = selected.gene
+         p.values.skat[i, 2] = SKAT_(E, G, covariates = NULL, weight = selected.weights.dis)$p.value
+         p.values.skat[i, 3] = SKAT_(E, G, covariates = NULL, weight = selected.weights.maf * selected.weights.cadd)$p.value
+         p.values.skat[i, 4] = SKAT_(E, G, covariates = NULL, weight = selected.weights.maf)$p.value
+         p.values.skat[i, 5] = SKAT_(E, G, covariates = NULL, weight = selected.weights.maf * selected.weights.dis)$p.value
+         p.values.skat[i, 6] = SKAT_(E, G, covariates = NULL, weight = selected.weights.dis * selected.weights.cadd * selected.weights.maf)$p.value
+         p.values.skat[i, 7] = SKAT_(E, G, covariates = NULL, weight = selected.weights.unweighted)$p.value
+         p.values.skat[i, 8] = SKAT_(E, G, covariates = NULL, weight = selected.weights.linsight)$p.value
+         p.values.skat[i, 9] = SKAT_(E, G, covariates = NULL, weight = selected.weights.cadd)$p.value
          
          print("VT")
          print(p.values.vt[i, ])
@@ -604,18 +658,21 @@ weights.file.prefix <- args[9]
 print(args)
 
 require(Rcpp)
-sourceCpp("/u/nobackup/eeskin2/k8688933/rare_var/script/lrt.cpp")
+require(parallel)
+sourceCpp("./methods_source/lrt.cpp")
+source("./methods_source/rareVariantTests.functions_only.R")
 
 require(data.table)
 geno.matrix <- fread(geno.matrix.file, data.table=F)
-tissue.expr <- fread(paste("zcat ", tissue.expr.file), data.table=F)
-tissue.expr$gene_id <- gsub("\\..*", "", tissue.expr$gene_id)
+tissue.expr <- fread(cmd=paste("zcat ", tissue.expr.file), data.table=F)
+# tissue.expr$gene_id <- gsub("\\..*", "", tissue.expr$gene_id)
 gene.set <- fread(gene.set.file, header=F, data.table=F)
 gene.list <- fread(gene.list.file, header=F, data.table=F)
 covar <- fread(covariates.file, data.table=F)
 result.file <- paste(result.file.prefix, c("vt.csv", "lrt.csv", "skat.csv"), sep=".")
 
-p.values <- perform.test(tissue.expr=tissue.expr, geno.matrix=geno.matrix, gene.set=gene.set, covar=covar, gene.list=gene.list, start=start, end=end, weights.file.prefix=weights.file.prefix)
+nodes <- parallel::detectCores(all.tests=T)
+p.values <- perform.test(tissue.expr=tissue.expr, geno.matrix=geno.matrix, gene.set=gene.set, covar=covar, gene.list=gene.list, start=start, end=end, weights.file.prefix=weights.file.prefix, nodes=nodes)
 write.csv(p.values[[1]], result.file[1], quote=F, row.names=F)
 write.csv(p.values[[2]], result.file[2], quote=F, row.names=F)
 write.csv(p.values[[3]], result.file[3], quote=F, row.names=F)

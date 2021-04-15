@@ -718,7 +718,7 @@ result.file <- args[5]
 print(args)
 
 require(Rcpp)
-sourceCpp("/u/nobackup/eeskin2/k8688933/rare_var/script/lrt.cpp")
+sourceCpp("./lrt.cpp")
 
 # hap is read from cosi result
 require(data.table)

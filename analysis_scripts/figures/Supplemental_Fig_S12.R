@@ -4,7 +4,7 @@
     require(tidyr)
     require(dplyr)
     require(Cairo)
-    setwd("/Users/avallonking/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/")
+    setwd("./data")
     # load data - RV eGenes
     {
         indiv.with.rare.var <- lapply(dir("indiv.with.rare.var.idx/", full.names = T), function(x) {try(fread(x), T)})
@@ -113,7 +113,7 @@
     }
 
     {
-    CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/outliers.prop.by.total.outliers.per.tissue.lrt.only.pdf", width = 12, height = 8)
+    CairoPDF("../../materials/outliers.prop.by.total.outliers.per.tissue.lrt.only.pdf", width = 12, height = 8)
     p <- ggplot(na.omit(result) %>% filter(method == "LRT-q") %>% arrange(mean.prop.rare.outliers) %>% 
                 mutate(tissue=factor(tissue, levels=tissue)), 
             aes(x=tissue, y=mean.prop.rare.outliers, colour=tissue)) + 

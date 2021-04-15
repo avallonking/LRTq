@@ -59,8 +59,15 @@ cd LRTq/analysis_scripts/figures
 git clone https://github.com/avallonking/LRTq-Data
 # rename the folder as data
 mv LRTq-Data data
+# make the directory for storing the generated plots
+mkdir ../materials
 # run the scripts to generate figures and tables
 ```
 
 #### Organization of this repository
-Scripts for generating all figures are in `LRTq/blob/master/analysis_scripts/figures/`
+- Source codes for `LRTq` R package are in `LRTq/src/LRTq.cpp`
+- Scripts for generating all figures in the paper are in `LRTq/analysis_scripts/figures/`
+- Parameter settings for simulating genotypes are in `LRTq/analysis_scripts/cosi`
+- R scripts for running LRT-q and other methods on the GTEx dataset are in `LRTq/analysis_scripts/gtex/association_tests`
+- R scripts for analyzing the results of the GTEx dataset are in `LRTq/analysis_scripts/gtex/statistical_analysis`
+- R scripts for running the simulation experiments are in `LRTq/analysis_scripts/simulation`
