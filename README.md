@@ -49,5 +49,18 @@ LRTq(expr = E, geno = G, causal_ratio = rep(0.30, ncol(G)), perm = 1000)
 ## due to the randomness in the permutation test
 ```
 
+To reproduce the figures in the paper, please download the `analysis_scripts` folder and the "[LRTq-Data](https://github.com/avallonking/LRTq-Data)" repository. Decompose the "LRTq-Data" repository under `analysis_scripts/figures`, and rename it as `data/`. **Note that it is important to use the correct folder name (`data/`), otherwise the scripts cannot work.** For example, a user with a Linux or MasOS machine can do
+```bash
+# download the scripts
+git clone https://github.com/avallonking/LRTq
+# go to the directory with the scripts to generate figures
+cd LRTq/analysis_scripts/figures
+# download the required data
+git clone https://github.com/avallonking/LRTq-Data
+# rename the folder as data
+mv LRTq-Data data
+# run the scripts to generate figures and tables
+```
+
 #### Organization of this repository
 Scripts for generating all figures are in `LRTq/blob/master/analysis_scripts/figures/`
