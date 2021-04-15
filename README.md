@@ -49,16 +49,19 @@ LRTq(expr = E, geno = G, causal_ratio = rep(0.30, ncol(G)), perm = 1000)
 ## due to the randomness in the permutation test
 ```
 
-To reproduce the figures in the paper, please download the `analysis_scripts` folder and the "[LRTq-Data](https://github.com/avallonking/LRTq-Data)" repository. Decompose the "LRTq-Data" repository under `analysis_scripts/figures`, and rename it as `data/`. **Note that it is important to use the correct folder name (`data/`), otherwise the scripts cannot work.** For example, a user with a Linux or MasOS machine can do
+To reproduce the figures in the paper, please download the `analysis_scripts` folder and the "LRTq-Data" (https://drive.google.com/drive/folders/13HVdPpyOxCQCHxjfsGk3_gf4nrZfrTc1?usp=sharing). Decompose the "LRTq-Data" folder under `analysis_scripts/figures`, and rename it as `data/`. Also, decompose the `pvals.tar.gz` in the `data/` folder. Then run the scripts in the `analysis_scripts/figures` directory. **Note that it is important to use the correct folder name (`data/`), otherwise the scripts cannot work.** For example, a user with a Linux or MasOS machine can do
 ```bash
 # download the scripts
 git clone https://github.com/avallonking/LRTq
 # go to the directory with the scripts to generate figures
 cd LRTq/analysis_scripts/figures
-# download the required data
-git clone https://github.com/avallonking/LRTq-Data
+# download the required data from https://drive.google.com/drive/folders/13HVdPpyOxCQCHxjfsGk3_gf4nrZfrTc1?usp=sharing
 # rename the folder as data
 mv LRTq-Data data
+# decompose the pvals.tar.gz in the data/ folder
+cd data
+tar xvzf pvals.tar.gz
+cd ..
 # make the directory for storing the generated plots
 mkdir ../materials
 # run the scripts to generate figures and tables
