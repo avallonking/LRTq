@@ -4,8 +4,8 @@
   library(Cairo)
   library(dplyr)
   
-  egene.count = fread("projects/rare_variant/gtex/all_tissues/gtex8/egene.counts.csv")
-  sample.size = fread("projects/rare_variant/gtex/all_tissues/gtex8/sample.size.csv")
+  egene.count = fread("./data/egene.counts.csv")
+  sample.size = fread("./data/sample.size.csv")
   egene.count$sample.size = sample.size$total.samples
   egene.count$total.genes = sample.size$genes
   egene.count$lrt.egenes.per.gene = egene.count$lrt.egenes / egene.count$total.genes
@@ -15,14 +15,14 @@
   
   # Fig 2A
   p = ggscatter(egene.count, x="sample.size", y="lrt.egenes", color="tissue")
-  CairoPDF("projects/rare_variant/materials/egenes.vs.sample.size.pdf")
+  CairoPDF("../materials/egenes.vs.sample.size.pdf")
   ggpar(p, legend="none", ylab="Number of eGenes detected by LRT-q",
         xlab="Number of samples", font.tickslab = 13, font.legend = 13, 
         font.main = 13, font.x = 13, font.y = 13)
   dev.off()
   
   # Fig 2B
-  CairoPDF("projects/rare_variant/materials/rv.egenes.each.tissue.pdf", width = 12)
+  CairoPDF("../materials/rv.egenes.each.tissue.pdf", width = 12)
   t = melt(egene.count %>% filter(lrt.egenes > 0) 
            %>% as.data.table(), 
            id.vars = c("tissue", "sample.size"), 

@@ -8,7 +8,6 @@
   library(reshape2)
   library(Cairo)
   library(dplyr)
-  # shared.q = readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/qvals.shared.by.weights.tissues.rds")
   reorder_cormat <- function(cormat) {
     # Use correlation between variables as distance
     na.idx <- apply(cormat, 1, function(x) all(is.na(x)))
@@ -53,21 +52,16 @@
     return(ggheatmap)
   }
   
-  # ggcorrplot(cor(shared.q$MAFxCADD, method = "spearman"), hc.order = T, 
-  #            outline.color = "white", type = "upper", lab = F, 
-  #            title = "Tissue correlation", 
-  #            legend.title = "Spearman's coefficient", tl.cex = 8)
-  
   # RV eGenes
-  CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/tissue.sharing.corr.matrix.pdf")
-  corr.matrix <- readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/tissue_sharing//tissue_sharing.fraction_shared_egenes.lrt.0.10.rds")
+  CairoPDF("../materials/tissue.sharing.corr.matrix.pdf")
+  corr.matrix <- readRDS("./data/tissue_sharing/tissue_sharing.fraction_shared_egenes.lrt.0.10.rds")
   # plot.sharing.mat(reorder_cormat(corr.matrix))
   plot.sharing.mat(corr.matrix)
   dev.off()
   
   # clustered
-  CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/tissue.sharing.corr.matrix.clustered.pdf")
-  corr.matrix <- readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/tissue_sharing//tissue_sharing.fraction_shared_egenes.lrt.0.10.rds")
+  CairoPDF("../materials/tissue.sharing.corr.matrix.clustered.pdf")
+  corr.matrix <- readRDS("./data/tissue_sharing/tissue_sharing.fraction_shared_egenes.lrt.0.10.rds")
   plot.sharing.mat(reorder_cormat(corr.matrix))
   # plot.sharing.mat(corr.matrix)
   dev.off()
@@ -82,8 +76,8 @@
   library(Cairo)
  
   group.limit = 4
-  rv = readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/tissue_sharing/tissue_sharing.prop_shared_egenes.by.num_tissues.lrt.q.thres.0.05.num.egene.thres.200.rv.egenes.rds")
-  cv = readRDS("~/Documents/scires/Jae-Hoon/projects/rare_variant/gtex/all_tissues/gtex8/tissue_sharing//tissue_sharing.prop_shared_egenes.by.num_tissues.lrt.q.thres.0.05.num.egene.thres.200.cv.egenes.rds")
+  rv = readRDS("./data/tissue_sharing/tissue_sharing.prop_shared_egenes.by.num_tissues.lrt.q.thres.0.05.num.egene.thres.200.rv.egenes.rds")
+  cv = readRDS("./data/tissue_sharing/tissue_sharing.prop_shared_egenes.by.num_tissues.lrt.q.thres.0.05.num.egene.thres.200.cv.egenes.rds")
   df3 = rbind(rv[1, ], cv[1, ])
   df3$num.tissues = as.character(df3$num.tissues)
   df3$type = c(rep("RV eGenes", 1), rep("CV eGenes", 1))
@@ -96,7 +90,7 @@
   df3 = rbind(df3, c(paste(">", group.limit, sep=" "), 
                      1-sum(cv$prop.shared[1:group.limit]), "CV eGenes"))
   df3$prop.shared = as.numeric(df3$prop.shared)
-  CairoPDF("~/Documents/scires/Jae-Hoon/projects/rare_variant/materials/prop.shared.cv.egenes.rv.egenes.num.tissues.grouped.200.pdf")
+  CairoPDF("../materials/prop.shared.cv.egenes.rv.egenes.num.tissues.grouped.200.pdf")
   p = ggbarplot(df3, x="num.tissues", y="prop.shared", xlab = "Number of tissues", 
                 ylab = "Proportion of shared eGenes", fill = "type", 
                 position = position_dodge())
