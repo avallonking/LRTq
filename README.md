@@ -55,14 +55,25 @@ To reproduce the figures in the paper, please download the `analysis_scripts` fo
 git clone https://github.com/avallonking/LRTq
 # go to the directory with the scripts to generate figures
 cd LRTq/analysis_scripts/figures
-# download the required data
-git clone https://github.com/avallonking/LRTq-Data
+# download the required data from Google Drive with the provided link
 # rename the folder as data
 mv LRTq-Data data
 # make the directory for storing the generated plots
 mkdir ../materials
 # run the scripts to generate figures and tables
 ```
+
+To re-run the simulation study, users can use the R scripts in ```LRTq/analysis_scripts/simulation/```:
+- ```power.simulate.new.R```: power simulation. It runs LRT-q and other methods on the simulated data assuming there are at least one rare variants regulating gene expression. Usage: ```Rscript power.simulate.new.R [simulated haplotypes] [repeats] [causal ratio] [a (constant)] [output file name]```The simulated haplotypes could be ```data/simulation/haplotype/len5k_110var/processed.sim.hap1.100var.tsv``` 
+- ```typeIerror.simulation.new.R```: type I error simulation. It runs LRT-q and other methods on the simulated data assuming there are no rare variants affecting gene expression. Usage: ```Rscript typeIerror.simulation.new.R [simulated haplotyes] [permutations] [repeats] [output file name]```The simulated haplotypes could be ```data/simulation/haplotype/len5k_110var/processed.sim.hap1.100var.tsv```
+
+To re-run the analysis of GTEx, users can use the R scripts in ```LRTq/analysis_scripts/gtex/association_tests/```:
+- ```acat.R```: run ACAT on the GTEx dataset
+- ```acat.regress_out_common_eqtls.R```: run ACAT on the GTEx dataset and regress out the effects of common eQTLs
+- ```faster.gtex_power_test.modified.fixed.more_perm.speed_up.other_tissues.R```: run LRT-q, SKAT-O, and VT on the GTEx dataset
+- ```faster.gtex_power_test.modified.fixed.more_perm.speed_up.other_tissues.maf01.R```: run LRT-q, SKAT-O, and VT on the GTEx dataset, only considering rare variants with MAF < 0.01
+- ```faster.gtex_power_test.modified.fixed.more_perm.speed_up.other_tissues.regress_out_common_eqtls.R```: run LRT-q, SKAT-O, and VT on the GTEx dataset and regress out the effects of common eQTLs
+
 
 #### Organization of this repository
 - Source codes for `LRTq` R package are in `LRTq/src/LRTq.cpp`
