@@ -49,18 +49,23 @@ LRTq(expr = E, geno = G, causal_ratio = rep(0.30, ncol(G)), perm = 1000)
 ## due to the randomness in the permutation test
 ```
 
+#### Organization of this repository
+- Source codes for `LRTq` R package are in `LRTq/src/LRTq.cpp`
+- Scripts for generating all figures in the paper are in `LRTq/analysis_scripts/figures/`
+- Parameter settings for simulating genotypes are in `LRTq/analysis_scripts/cosi`
+- R scripts for running LRT-q and other methods on the GTEx dataset are in `LRTq/analysis_scripts/gtex/association_tests`
+- R scripts for analyzing the results of the GTEx dataset are in `LRTq/analysis_scripts/gtex/statistical_analysis`
+- R scripts for running the simulation experiments are in `LRTq/analysis_scripts/simulation`
 To reproduce the figures in the paper, please download the `analysis_scripts` folder and the "LRTq-Data" (https://drive.google.com/drive/folders/13HVdPpyOxCQCHxjfsGk3_gf4nrZfrTc1?usp=sharing). Decompose the "LRTq-Data" folder under `analysis_scripts/figures`, and rename it as `data/`. Also, decompose the `pvals.tar.gz` in the `data/` folder. Then run the scripts in the `analysis_scripts/figures` directory. **Note that it is important to use the correct folder name (`data/`), otherwise the scripts cannot work.** For example, a user with a Linux or MasOS machine can do
+
 ```bash
 # download the scripts
 git clone https://github.com/avallonking/LRTq
 # go to the directory with the scripts to generate figures
 cd LRTq/analysis_scripts/figures
-<<<<<<< HEAD
-# download the required data from Google Drive with the provided link
-=======
-# download the required data from https://drive.google.com/drive/folders/13HVdPpyOxCQCHxjfsGk3_gf4nrZfrTc1?usp=sharing
->>>>>>> c462924d72ecb7d06125c2d3013c42f23c98e22c
-# rename the folder as data
+# download the required data from Google Drive 
+# https://drive.google.com/drive/folders/13HVdPpyOxCQCHxjfsGk3_gf4nrZfrTc1?usp=sharing
+# rename the downloaded folder as "data"
 mv LRTq-Data data
 # decompose the pvals.tar.gz in the data/ folder
 cd data
@@ -102,10 +107,3 @@ Rscript $rscript $tissue_gene_expression $genotype_matrix $gene_snp_set $covaria
 - ```$common_eqtl_file```: summary statistics of common eQTLs within 20kb, 50kb, or 100kb from TSS, which are extracted from GTEx eQTL summary statistics. Users can use the files in ```data/common_eqtls```
 - ```$common_geno_matrix_file```: a SNP by individuals genotypes matrix of common eQTLs to be regressed out
 
-#### Organization of this repository
-- Source codes for `LRTq` R package are in `LRTq/src/LRTq.cpp`
-- Scripts for generating all figures in the paper are in `LRTq/analysis_scripts/figures/`
-- Parameter settings for simulating genotypes are in `LRTq/analysis_scripts/cosi`
-- R scripts for running LRT-q and other methods on the GTEx dataset are in `LRTq/analysis_scripts/gtex/association_tests`
-- R scripts for analyzing the results of the GTEx dataset are in `LRTq/analysis_scripts/gtex/statistical_analysis`
-- R scripts for running the simulation experiments are in `LRTq/analysis_scripts/simulation`
