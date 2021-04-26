@@ -82,6 +82,25 @@ To re-run the analysis of GTEx, users can use the R scripts in ```LRTq/analysis_
 - ```faster.gtex_power_test.modified.fixed.more_perm.speed_up.other_tissues.maf01.R```: run LRT-q, SKAT-O, and VT on the GTEx dataset, only considering rare variants with MAF < 0.01
 - ```faster.gtex_power_test.modified.fixed.more_perm.speed_up.other_tissues.regress_out_common_eqtls.R```: run LRT-q, SKAT-O, and VT on the GTEx dataset and regress out the effects of common eQTLs
 
+Usage (output: p-values of each gene for different weights):
+```sh
+# The general analysis of GTEx
+Rscript $rscript $tissue_gene_expression $genotype_matrix $gene_snp_set $covariates $gene_list $start $end $result_file_prefix $weight_file_prefix
+# Regress out the effects of common eQTLs
+Rscript $rscript $tissue_gene_expression $genotype_matrix $gene_snp_set $covariates $gene_list $start $end $result_file_prefix $weight_file_prefix $common_eqtl_file $common_geno_matrix_file
+```
+- ```$rscript```: R scripts in ```LRTq/analysis_scripts/gtex/association_tests/```
+- ```$tissue_gene_expression```: gene expression matrix. In our study, it is acquired from GTEx portal
+- ```$genotype_matrix```: a SNP by individuals matrix of rare variants genotypes, encoded with 0, 1, 2
+- ```$gene_snp_set```: gene-snp set files indicating the group of SNPs within 20kb from TSS of genes. It has two columns where the first column is genes and the second column is SNPs. Users can use the gene-snp set files in ```data/gene_snp_set```, which are sorted by chromosomes
+- ```$covariates```: covariates acquired from GTEx portal. **Note that the original covariates matrices should be _transposed_ before using them as input**
+- ```$gene_list```: lists of genes expressed. Users can use the list files in ```data/gene_list_v8```, which are sorted by tissues and chromosomes
+- ```$start```: starting index in the gene list, which indicates the gene to analyze in the beginning
+- ```$end```: ending index in the gene list, which indicates the gene to analyze in the end
+- ```$result_file_prefix```: prefix of the result files. The results files would be ```$result_file_prefix.lrt.csv```, ```$result_file_prefix.skat.csv```, ```$result_file_prefix.acat.csv```, ```$result_file_prefix.vt.csv```, representing outputs of LRT-q, SKAT-O, ACAT, and VT
+- ```$weight_file_prefix```: prefix of weight files. Users are recommended to use ```data/weights/chr.$chromosome.rare.weight.summary```
+- ```$common_eqtl_file```: summary statistics of common eQTLs within 20kb, 50kb, or 100kb from TSS, which are extracted from GTEx eQTL summary statistics. Users can use the files in ```data/common_eqtls```
+- ```$common_geno_matrix_file```: a SNP by individuals genotypes matrix of common eQTLs to be regressed out
 
 #### Organization of this repository
 - Source codes for `LRTq` R package are in `LRTq/src/LRTq.cpp`
